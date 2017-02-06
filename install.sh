@@ -2,6 +2,12 @@
 BASEDIR=$(dirname "$0")
 
 apt-get update
+apt-get install -y git
+apt-get install -y curl
+apt-get install -y sudo
+apt-get install -y wget
+apt-get install -y python3-pip
+apt-get install -y nano
 apt-get install -y git curl ntpdate
 apt-get install -y build-essential libxml2-dev libxslt1-dev libffi-dev libssl-dev zlib1g-dev python3-dev python3-lxml python3-pip 
 pip3 install -U setuptools
