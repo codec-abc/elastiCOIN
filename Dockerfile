@@ -30,9 +30,6 @@ WORKDIR /tmp
 RUN wget -c https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.0.deb
 RUN pip3 install -U elasticsearch==5.1.0
 
-RUN apt-get install -y nano
-# http://unix.stackexchange.com/questions/138188/easily-unpack-deb-edit-postinst-and-repack-deb
-
 RUN dpkg-deb -R elasticsearch-5.2.0.deb elasticFix
 RUN sed -i elasticFix/DEBIAN/postinst -re '55,68d' 
 RUN dpkg-deb -b elasticFix Elasticfixed.deb
@@ -43,12 +40,22 @@ RUN git clone https://github.com/codec-abc/elastiCOIN.git elasticcoin
 WORKDIR elasticcoin
 RUN git checkout dev
 
-USER elasticsearch
+WORKDIR /tmp
+RUN wget -c https://artifacts.elastic.co/downloads/kibana/kibana-5.2.0-amd64.deb
+RUN dpkg -i kibana-5.2.0-amd64.deb
+RUN sed -i 's|^#\?\(server.host:\).*|\1 "0.0.0.0"|g' /etc/kibana/kibana.yml
 
-# /usr/share/elasticsearch/bin/elasticsearch -Edefault.path.logs=/var/log/elasticsearch -Edefault.path.data=/var/lib/elasticsearch -Edefault.path.conf=/etc/elasticsearch & 
+RUN echo "root:docker" | chpasswd
+
+USER elasticsearch
+WORKDIR /elasticcoin
+
+EXPOSE 5601
+
+# /usr/share/elasticsearch/bin/elasticsearch -Edefault.path.logs=/var/log/elasticsearch -Edefault.path.data=/var/lib/elasticsearch -Edefault.path.conf=/etc/elasticsearch > /dev/null 2>&1 &
 # python3 elasticsearch/setup.py
+# su root
+# /usr/share/kibana/bin/kibana > /dev/null 2>&1 &
 
 # docker build -t elasticcoin .
-# docker run -it elasticcoin
-
-# EXPOSE 9300
+# docker run -p 5601:5601 -it elasticcoin
