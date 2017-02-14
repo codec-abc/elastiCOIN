@@ -31,15 +31,20 @@ RUN wget -c https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5
 RUN pip3 install -U elasticsearch==5.1.0
 
 RUN apt-get install -y nano
-# RUN dpkg -i elasticsearch-5.2.0.deb
-# cat /var/lib/dpkg/info/elasticsearch.postinst
-# rm /var/lib/dpkg/info/elasticsearch.postinst
 # http://unix.stackexchange.com/questions/138188/easily-unpack-deb-edit-postinst-and-repack-deb
 
-# WORKDIR /
-# RUN git clone https://github.com/codec-abc/elastiCOIN.git elasticcoin
-# RUN git checkout dev \
-#     python3 elasticcoin/elasticsearch/setup.py
+RUN dpkg-deb -R elasticsearch-5.2.0.deb elasticFix
+RUN sed -i elasticFix/DEBIAN/postinst -re '55,68d' 
+RUN dpkg-deb -b elasticFix Elasticfixed.deb
+RUN dpkg -i Elasticfixed.deb
+
+RUN /etc/init.d/elasticsearch start
+
+WORKDIR /
+RUN git clone https://github.com/codec-abc/elastiCOIN.git elasticcoin
+WORKDIR elasticcoin
+RUN git checkout dev \
+    python3 elasticsearch/setup.py
 
 # EXPOSE 9200
 
