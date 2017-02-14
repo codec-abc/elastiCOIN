@@ -38,16 +38,17 @@ RUN sed -i elasticFix/DEBIAN/postinst -re '55,68d'
 RUN dpkg-deb -b elasticFix Elasticfixed.deb
 RUN dpkg -i Elasticfixed.deb
 
-RUN /etc/init.d/elasticsearch start
-
 WORKDIR /
 RUN git clone https://github.com/codec-abc/elastiCOIN.git elasticcoin
 WORKDIR elasticcoin
-RUN git checkout dev \
-    python3 elasticsearch/setup.py
+RUN git checkout dev
 
-# EXPOSE 9200
+USER elasticsearch
 
+# /usr/share/elasticsearch/bin/elasticsearch -Edefault.path.logs=/var/log/elasticsearch -Edefault.path.data=/var/lib/elasticsearch -Edefault.path.conf=/etc/elasticsearch & 
+# python3 elasticsearch/setup.py
 
 # docker build -t elasticcoin .
 # docker run -it elasticcoin
+
+# EXPOSE 9300
